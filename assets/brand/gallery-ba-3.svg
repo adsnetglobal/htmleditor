@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480">
+  <rect width="720" height="480" fill="#F2F8FF"/>
+  <rect x="80" y="80" width="250" height="320" rx="20" fill="#fff"/>
+  <rect x="390" y="80" width="250" height="320" rx="20" fill="#fff"/>
+  <text x="150" y="430" font-family="Lato" font-size="30" fill="#345D55">Before</text>
+  <text x="470" y="430" font-family="Lato" font-size="30" fill="#C6788F">After</text>
+</svg>

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin-area.html
+Disallow: /dashboard.html
+Disallow: /login.html
+
+Sitemap: https://klinik.zhost.digital/sitemap.xml

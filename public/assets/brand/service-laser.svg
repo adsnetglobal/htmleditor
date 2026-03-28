@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#F9F8FF"/>
+  <rect x="130" y="100" width="460" height="300" rx="24" fill="#fff"/>
+  <circle cx="620" cy="160" r="85" fill="#E2F1ED"/>
+  <circle cx="650" cy="350" r="100" fill="#F7E0E8"/>
+  <text x="170" y="250" font-size="54" font-family="Lato" fill="#1F4A43" font-weight="700">Laser</text>
+  <text x="170" y="305" font-size="34" font-family="Lato" fill="#567C73">Brightening</text>
+</svg>

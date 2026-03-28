@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Favicon Zhost Klinik">
+  <defs>
+    <linearGradient id="f" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3A6B62"/>
+      <stop offset="100%" stop-color="#C6788F"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#f)"/>
+  <path d="M17 20h30L24 42h23v6H17l23-22H17z" fill="#fff"/>
+</svg>

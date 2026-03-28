@@ -1,0 +1,9 @@
+# ============================================
+# Cloudflare Pages Redirect/Rewrite Rules
+# ============================================
+
+/layanan/*   /service-detail.html   200
+/blog/*      /article.html          200
+
+# Redirect legacy service listing route
+/layanan      /services.html        301

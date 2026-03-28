@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="56" viewBox="0 0 240 56" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Zhost Klinik</title>
+  <desc id="desc">Logo resmi brand Zhost Klinik</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3A6B62"/>
+      <stop offset="100%" stop-color="#C6788F"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="56" height="56" rx="16" fill="url(#g)"/>
+  <path d="M15 19h26l-20 18h20v6H15l20-18H15z" fill="#fff"/>
+  <text x="68" y="24" font-family="Lato, Arial, sans-serif" font-weight="700" font-size="22" fill="#13342D">Zhost Klinik</text>
+  <text x="68" y="43" font-family="Lato, Arial, sans-serif" font-size="12" fill="#5C7C74">Advanced Aesthetic Care</text>
+</svg>
