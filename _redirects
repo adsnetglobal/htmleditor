@@ -7,6 +7,3 @@
 
 # Redirect legacy service listing route
 /layanan      /services.html        301
-
-# Fallback for deep links (non-file routes)
-/*            /index.html           200
