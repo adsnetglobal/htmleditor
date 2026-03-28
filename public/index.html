@@ -1,8 +1,277 @@
-import React, { useState, useEffect, useRef } from 'react';
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTML Live Editor</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef2ff;
+      --panel: #ffffff;
+      --panel-2: #111827;
+      --border: #d1d5db;
+      --muted: #6b7280;
+      --primary: #4f46e5;
+      --primary-2: #4338ca;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+    }
 
-export default function App() {
-  // State untuk menyimpan kode HTML bawaan (default)
-  const defaultCode = `<!DOCTYPE html>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background: var(--bg);
+      color: #111827;
+      min-height: 100vh;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #1f2937;
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #111827;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: .2px;
+    }
+
+    .header-sub {
+      color: #9ca3af;
+      font-size: .9rem;
+      text-align: right;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .pane {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--panel);
+    }
+
+    .pane + .pane {
+      border-left: 1px solid var(--border);
+    }
+
+    .pane-label {
+      padding: 10px 12px;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      color: #e5e7eb;
+      background: var(--panel-2);
+    }
+
+    .editor-textarea {
+      flex: 1;
+      width: 100%;
+      resize: none;
+      border: 0;
+      outline: none;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.55;
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    .preview-head {
+      padding: 10px 12px;
+      background: var(--success-bg);
+      color: var(--success-text);
+      border-bottom: 1px solid #bbf7d0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+
+    .badge {
+      font-size: .67rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #86efac;
+      color: #166534;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      font-weight: 800;
+    }
+
+    /* Toolbar WAJIB tepat di atas area Live Preview */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .02);
+    }
+
+    .btn {
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      color: #1f2937;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn:hover { background: #f1f5f9; }
+    .btn:active { transform: translateY(1px); }
+
+    .toolbar select,
+    .toolbar input[type="color"] {
+      height: 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      padding: 0 8px;
+      cursor: pointer;
+      font-size: .9rem;
+    }
+
+    .toolbar .group {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 3px 6px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .toolbar .sep {
+      width: 1px;
+      height: 24px;
+      background: #d1d5db;
+      margin: 0 2px;
+    }
+
+    .preview-frame {
+      flex: 1;
+      width: 100%;
+      border: 0;
+      background: #fff;
+      min-height: 0;
+    }
+
+    @media (max-width: 980px) {
+      .main { flex-direction: column; }
+      .pane { width: 100%; min-height: 50vh; }
+      .pane + .pane { border-left: 0; border-top: 1px solid var(--border); }
+      .header { flex-direction: column; align-items: flex-start; }
+      .header-sub { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-title">&lt;/&gt; HTML Live Editor</div>
+      <div class="header-sub">Pilih teks di Preview, klik toolbar, HTML kiri otomatis ikut berubah.</div>
+    </header>
+
+    <main class="main">
+      <section class="pane">
+        <div class="pane-label">index.html (Source)</div>
+        <textarea id="html-editor" class="editor-textarea" spellcheck="false"></textarea>
+      </section>
+
+      <section class="pane">
+        <div class="preview-head">
+          <span>Live Preview (Editable)</span>
+          <span class="badge">Two-way Sync</span>
+        </div>
+
+        <div class="toolbar" id="toolbar">
+          <button type="button" class="btn" data-cmd="bold" title="Bold"><b>B</b></button>
+          <button type="button" class="btn" data-cmd="italic" title="Italic"><i>I</i></button>
+          <button type="button" class="btn" data-cmd="underline" title="Underline"><u>U</u></button>
+          <button type="button" class="btn" data-cmd="strikeThrough" title="Strike"><s>S</s></button>
+          <div class="sep"></div>
+
+          <select id="font-name" title="Jenis Font">
+            <option value="">Font...</option>
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Courier New">Courier</option>
+            <option value="Times New Roman">Times</option>
+          </select>
+
+          <select id="font-size" title="Ukuran Font">
+            <option value="">Ukuran...</option>
+            <option value="1">Sangat kecil</option>
+            <option value="2">Kecil</option>
+            <option value="3">Normal</option>
+            <option value="4">Sedang</option>
+            <option value="5">Besar</option>
+            <option value="6">Sangat besar</option>
+            <option value="7">Raksasa</option>
+          </select>
+
+          <div class="sep"></div>
+
+          <span class="group">
+            <label for="text-color">Teks</label>
+            <input id="text-color" type="color" value="#000000" title="Warna Teks" />
+          </span>
+
+          <span class="group">
+            <label for="bg-color">Latar</label>
+            <input id="bg-color" type="color" value="#ffff00" title="Warna Latar" />
+          </span>
+
+          <div class="sep"></div>
+
+          <button type="button" class="btn" data-cmd="justifyLeft" title="Rata Kiri">↤</button>
+          <button type="button" class="btn" data-cmd="justifyCenter" title="Rata Tengah">↔</button>
+          <button type="button" class="btn" data-cmd="justifyRight" title="Rata Kanan">↦</button>
+        </div>
+
+        <iframe id="preview-frame" title="Live Preview" class="preview-frame" sandbox="allow-scripts allow-modals"></iframe>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const defaultCode = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -31,6 +300,7 @@ export default function App() {
     }
     p {
       color: #4b5563;
+      line-height: 1.5;
     }
     button {
       background-color: #4f46e5;
@@ -43,259 +313,183 @@ export default function App() {
       margin-top: 1rem;
       transition: background-color 0.3s;
     }
-    button:hover {
-      background-color: #4338ca;
-    }
+    button:hover { background-color: #4338ca; }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Halo, Dunia! 👋</h1>
-    <p>Edit teks ini langsung di preview untuk mengubah kodenya!</p>
+    <p>Blok teks ini di preview, lalu klik toolbar Bold/Warna/Ukuran.</p>
     <button onclick="alert('Tombol diklik!')">Coba Klik Saya</button>
   </div>
 </body>
 </html>`;
 
-  const [htmlCode, setHtmlCode] = useState(defaultCode);
-  const [iframeCode, setIframeCode] = useState(defaultCode);
-  const iframeRef = useRef(null); // Menambahkan referensi untuk mengakses iframe
+      const editor = document.getElementById('html-editor');
+      const frame = document.getElementById('preview-frame');
+      const toolbar = document.getElementById('toolbar');
+      const fontName = document.getElementById('font-name');
+      const fontSize = document.getElementById('font-size');
+      const textColor = document.getElementById('text-color');
+      const bgColor = document.getElementById('bg-color');
 
-  // Mendengarkan perubahan dari dalam iframe (live edit di preview)
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.data?.type === 'UPDATE_FROM_PREVIEW') {
-        // Hanya perbarui htmlCode (kiri), jangan iframeCode agar cursor/fokus tidak hilang
-        setHtmlCode(event.data.code);
+      let htmlCode = defaultCode;
+      let iframeCode = defaultCode;
+
+      function buildInjectedHtml(code) {
+        const styleToInject = `
+<style data-live-editor="true">
+  *, a, button {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
+</style>`;
+
+        const scriptToInject = `
+<script data-live-editor="true">
+(function(){
+  window.alert = function(){ console.log('Alert diblok saat mode edit'); };
+  window.confirm = function(){ return false; };
+  window.prompt = function(){ return null; };
+
+  var savedRange = null;
+
+  function captureSelection() {
+    var sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      savedRange = sel.getRangeAt(0).cloneRange();
+    }
+  }
+
+  function sanitizeAndEmit() {
+    var clone = document.documentElement.cloneNode(true);
+    var body = clone.querySelector('body');
+    if (body) {
+      body.removeAttribute('contenteditable');
+      body.style.outline = '';
+      if (!body.getAttribute('style')) body.removeAttribute('style');
+    }
+    var injected = clone.querySelectorAll('[data-live-editor="true"]');
+    injected.forEach(function (node) { node.remove(); });
+    var result = '<!DOCTYPE html>\\n' + clone.outerHTML;
+    window.parent.postMessage({ type: 'UPDATE_FROM_PREVIEW', code: result }, '*');
+  }
+
+  function restoreSelection() {
+    var sel = window.getSelection();
+    if (savedRange && sel) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange);
+    }
+  }
+
+  if (document.body) {
+    document.body.contentEditable = 'true';
+    document.body.style.outline = 'none';
+    try { document.execCommand('styleWithCSS', false, true); } catch (e) {}
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest('a,button')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
+  document.addEventListener('selectionchange', captureSelection);
+  document.addEventListener('mouseup', captureSelection);
+  document.addEventListener('keyup', captureSelection);
+
+  var debounceTimer = null;
+  var observer = new MutationObserver(function () {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(sanitizeAndEmit, 220);
+  });
+
+  if (document.body) {
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true
+    });
+  }
+
+  window.addEventListener('message', function (event) {
+    if (!event.data || event.data.type !== 'FORMAT') return;
+    window.focus();
+    restoreSelection();
+    try {
+      document.execCommand(event.data.command, false, event.data.value || null);
+    } catch (err) {}
+    captureSelection();
+    sanitizeAndEmit();
+  });
+})();
+<\/script>`;
+
+        if (code.includes('</body>')) {
+          return code.replace('</body>', styleToInject + scriptToInject + '\n</body>');
+        }
+        return code + styleToInject + scriptToInject;
       }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
 
-  // Fungsi untuk menangani perubahan pada text area
-  const handleEditorChange = (e) => {
-    setHtmlCode(e.target.value);
-    setIframeCode(e.target.value);
-  };
+      function renderEditor() {
+        editor.value = htmlCode;
+      }
 
-  // Fungsi untuk mengirim perintah format (bold, warna, dll) ke iframe
-  const applyFormat = (command, value = null) => {
-    if (iframeRef.current && iframeRef.current.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({ type: 'FORMAT', command, value }, '*');
-    }
-  };
+      function renderPreview(code) {
+        frame.srcdoc = buildInjectedHtml(code);
+      }
 
-  // Fungsi untuk menyuntikkan script agar preview bisa diedit
-  const getInjectedHtml = (code) => {
-    const scriptToInject = `
-      <style data-live-editor="true">
-        /* Memaksa semua elemen (terutama tombol) agar teksnya bisa diblok/diseleksi */
-        *, button, a {
-          -webkit-user-select: text !important;
-          user-select: text !important;
-        }
-      </style>
-      <script data-live-editor="true">
-        // Lumpuhkan fungsi alert/popup bawaan agar tidak mengganggu proses edit
-        window.alert = () => console.log('Alert diblokir selama mode edit');
-        window.confirm = () => false;
-        window.prompt = () => null;
+      function applyFormat(command, value) {
+        if (!frame.contentWindow) return;
+        frame.contentWindow.postMessage({ type: 'FORMAT', command: command, value: value || null }, '*');
+      }
 
-        if (document.body) {
-          // Buat seluruh elemen di body bisa diedit
-          document.body.contentEditable = 'true';
-          document.body.style.outline = 'none';
-          
-          // Memaksa browser menggunakan inline CSS (<span style="color:...">) alih-alih tag <font>
-          // Hal ini memastikan warnanya bisa menimpa CSS bawaan tombol
-          try { document.execCommand('styleWithCSS', false, true); } catch(e) {}
-        }
+      editor.addEventListener('input', function (e) {
+        htmlCode = e.target.value;
+        iframeCode = e.target.value;
+        renderPreview(iframeCode);
+      });
 
-        // Mencegah link pindah halaman & Memblokir aksi default/inline onclick (seperti alert) saat proses edit
-        document.addEventListener('click', (e) => {
-          if (e.target.closest('a') || e.target.closest('button')) {
-            e.preventDefault();
-            e.stopPropagation(); // Hentikan eksekusi script milik tombol
-          }
-        }, true); // Gunakan fase 'capture' agar dieksekusi sebelum script di dalam elemen
+      window.addEventListener('message', function (event) {
+        if (!event.data || event.data.type !== 'UPDATE_FROM_PREVIEW') return;
+        if (typeof event.data.code !== 'string') return;
+        htmlCode = event.data.code;
+        renderEditor();
+      });
 
-        // Simpan posisi blok teks terakhir agar tidak hilang saat kita klik toolbar di luar iframe
-        let savedRange = null;
-        document.addEventListener('selectionchange', () => {
-          const sel = window.getSelection();
-          if (sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0);
-          }
+      toolbar.querySelectorAll('[data-cmd]').forEach(function (btn) {
+        btn.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          applyFormat(btn.getAttribute('data-cmd'));
         });
+      });
 
-        // Dengarkan perintah format dari parent (React Toolbar)
-        window.addEventListener('message', (event) => {
-          if (event.data?.type === 'FORMAT') {
-            window.focus(); // Paksa iframe untuk fokus kembali
-            const sel = window.getSelection();
-            
-            // Kembalikan seleksi kursor yang tersimpan (karena mengklik dropdown warna di parent melepas fokus)
-            if (savedRange) {
-              sel.removeAllRanges();
-              sel.addRange(savedRange);
-            }
-            
-            document.execCommand(event.data.command, false, event.data.value);
-          }
-        });
+      fontName.addEventListener('change', function () {
+        if (!fontName.value) return;
+        applyFormat('fontName', fontName.value);
+      });
 
-        let timeout;
-        const observer = new MutationObserver(() => {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            // Gandakan dokumen untuk dibersihkan sebelum dikirim
-            const clone = document.documentElement.cloneNode(true);
-            const body = clone.querySelector('body');
-            if (body) {
-              body.removeAttribute('contenteditable');
-              body.style.outline = '';
-              if (!body.getAttribute('style')) body.removeAttribute('style');
-            }
-            // Hapus script dan style injeksi ini agar tidak ikut masuk ke code editor
-            const script = clone.querySelector('script[data-live-editor="true"]');
-            if (script) script.remove();
-            const style = clone.querySelector('style[data-live-editor="true"]');
-            if (style) style.remove();
+      fontSize.addEventListener('change', function () {
+        if (!fontSize.value) return;
+        applyFormat('fontSize', fontSize.value);
+      });
 
-            let newHtml = '<!DOCTYPE html>\\n' + clone.outerHTML;
-            window.parent.postMessage({
-              type: 'UPDATE_FROM_PREVIEW',
-              code: newHtml
-            }, '*');
-          }, 500); // Debounce 500ms agar kode tidak terupdate terlalu cepat saat mengetik
-        });
+      textColor.addEventListener('input', function () {
+        applyFormat('foreColor', textColor.value);
+      });
 
-        if (document.body) {
-          observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
-        }
-      </script>
-    `;
-    
-    // Taruh script tepat sebelum tag penutup body
-    if (code.includes('</body>')) {
-      return code.replace('</body>', scriptToInject + '\\n</body>');
-    }
-    return code + scriptToInject;
-  };
+      bgColor.addEventListener('input', function () {
+        applyFormat('hiliteColor', bgColor.value);
+      });
 
-  return (
-    <div className="flex flex-col h-screen bg-gray-100 font-sans">
-      {/* Header Aplikasi */}
-      <header className="bg-gray-800 text-white p-4 shadow-md flex items-center justify-between z-10">
-        <div className="flex items-center gap-2">
-          <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-          </svg>
-          <h1 className="text-xl font-bold tracking-wide">HTML Live Editor</h1>
-        </div>
-        <div className="text-sm text-gray-400">
-          Ketik kode di kiri, lihat hasilnya di kanan
-        </div>
-      </header>
-
-      {/* Area Utama (Split Pane) */}
-      <main className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        
-        {/* Sisi Kiri: Editor */}
-        <div className="w-full md:w-1/2 h-1/2 md:h-full flex flex-col border-b md:border-b-0 md:border-r border-gray-700">
-          <div className="bg-gray-900 text-gray-400 py-2 px-4 text-sm font-mono border-b border-gray-800 flex justify-between items-center">
-            <span>index.html</span>
-          </div>
-          <textarea
-            className="flex-1 w-full bg-[#1e1e1e] text-gray-100 p-4 font-mono text-sm sm:text-base resize-none focus:outline-none focus:ring-0 leading-relaxed"
-            value={htmlCode}
-            onChange={handleEditorChange}
-            spellCheck="false"
-            placeholder="Ketik kode HTML di sini..."
-          />
-        </div>
-
-        {/* Sisi Kanan: Live Preview */}
-        <div className="w-full md:w-1/2 h-1/2 md:h-full bg-white relative flex flex-col">
-          <div className="bg-green-100 text-green-800 py-2 px-4 text-sm font-medium border-b border-green-200 shadow-sm flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              Live Preview (Bisa Diedit)
-            </div>
-            <span className="text-[10px] bg-green-200 text-green-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">
-              Two-Way Sync
-            </span>
-          </div>
-
-          {/* Toolbar Formatting untuk Live Editor */}
-          <div className="bg-gray-50 border-b border-gray-200 p-2 flex flex-wrap gap-2 items-center text-sm shadow-inner">
-            <button onMouseDown={(e) => { e.preventDefault(); applyFormat('bold'); }} className="w-8 h-8 flex justify-center items-center bg-white border border-gray-300 rounded hover:bg-gray-100 font-bold" title="Tebal (Bold)">B</button>
-            <button onMouseDown={(e) => { e.preventDefault(); applyFormat('italic'); }} className="w-8 h-8 flex justify-center items-center bg-white border border-gray-300 rounded hover:bg-gray-100 italic font-serif" title="Miring (Italic)">I</button>
-            <button onMouseDown={(e) => { e.preventDefault(); applyFormat('underline'); }} className="w-8 h-8 flex justify-center items-center bg-white border border-gray-300 rounded hover:bg-gray-100 underline" title="Garis Bawah">U</button>
-            <button onMouseDown={(e) => { e.preventDefault(); applyFormat('strikeThrough'); }} className="w-8 h-8 flex justify-center items-center bg-white border border-gray-300 rounded hover:bg-gray-100 line-through" title="Coret Text">S</button>
-            
-            <div className="w-px h-6 bg-gray-300 mx-1"></div>
-
-            <select onChange={(e) => applyFormat('fontName', e.target.value)} className="p-1.5 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none cursor-pointer" title="Jenis Font">
-              <option value="">Jenis Font...</option>
-              <option value="Arial">Arial</option>
-              <option value="Courier New">Courier</option>
-              <option value="Georgia">Georgia</option>
-              <option value="Times New Roman">Times</option>
-              <option value="Verdana">Verdana</option>
-            </select>
-
-            <select onChange={(e) => applyFormat('fontSize', e.target.value)} className="p-1.5 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none cursor-pointer" title="Ukuran Font">
-              <option value="">Ukuran...</option>
-              <option value="1">Sangat Kecil</option>
-              <option value="2">Kecil</option>
-              <option value="3">Normal</option>
-              <option value="4">Sedang</option>
-              <option value="5">Besar</option>
-              <option value="6">Sangat Besar</option>
-              <option value="7">Raksasa</option>
-            </select>
-
-            <div className="w-px h-6 bg-gray-300 mx-1"></div>
-
-            <div className="flex items-center gap-1 bg-white border border-gray-300 rounded px-2 py-1" title="Warna Teks">
-              <span className="text-gray-600 text-xs font-medium">Teks</span>
-              <input type="color" onInput={(e) => applyFormat('foreColor', e.target.value)} className="w-5 h-5 p-0 border-0 cursor-pointer bg-transparent" defaultValue="#000000" />
-            </div>
-
-            <div className="flex items-center gap-1 bg-white border border-gray-300 rounded px-2 py-1" title="Warna Latar (Highlight)">
-              <span className="text-gray-600 text-xs font-medium">Latar</span>
-              <input type="color" onInput={(e) => applyFormat('hiliteColor', e.target.value)} className="w-5 h-5 p-0 border-0 cursor-pointer bg-transparent" defaultValue="#ffffff" />
-            </div>
-
-            <div className="w-px h-6 bg-gray-300 mx-1"></div>
-
-            <button onMouseDown={(e) => { e.preventDefault(); applyFormat('justifyLeft'); }} className="p-1.5 bg-white border border-gray-300 rounded hover:bg-gray-100" title="Rata Kiri">
-               <svg className="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"></path></svg>
-            </button>
-            <button onMouseDown={(e) => { e.preventDefault(); applyFormat('justifyCenter'); }} className="p-1.5 bg-white border border-gray-300 rounded hover:bg-gray-100" title="Rata Tengah">
-               <svg className="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm4 4a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1zm-4 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm4 4a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z" clipRule="evenodd"></path></svg>
-            </button>
-            <button onMouseDown={(e) => { e.preventDefault(); applyFormat('justifyRight'); }} className="p-1.5 bg-white border border-gray-300 rounded hover:bg-gray-100" title="Rata Kanan">
-               <svg className="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm8 4a1 1 0 011-1h4a1 1 0 110 2h-4a1 1 0 01-1-1zm-8 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm8 4a1 1 0 011-1h4a1 1 0 110 2h-4a1 1 0 01-1-1z" clipRule="evenodd"></path></svg>
-            </button>
-          </div>
-
-          {/* Menggunakan iframe dengan atribut srcDoc untuk merender HTML secara langsung dan aman */}
-          <iframe
-            ref={iframeRef}
-            title="Live Preview"
-            className="flex-1 w-full h-full border-none bg-white"
-            srcDoc={getInjectedHtml(iframeCode)}
-            sandbox="allow-scripts allow-modals"
-          />
-        </div>
-        
-      </main>
-    </div>
-  );
-}
+      htmlCode = defaultCode;
+      iframeCode = defaultCode;
+      renderEditor();
+      renderPreview(iframeCode);
+    })();
+  </script>
+</body>
+</html>
