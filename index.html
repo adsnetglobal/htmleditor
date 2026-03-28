@@ -155,7 +155,8 @@
     .btn:active { transform: translateY(1px); }
 
     .toolbar select,
-    .toolbar input[type="color"] {
+    .toolbar input[type="color"],
+    .toolbar input[type="text"] {
       height: 34px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -173,6 +174,31 @@
       border: 1px solid #e2e8f0;
       border-radius: 10px;
       background: #fff;
+    }
+
+    .toolbar .group .tool-label {
+      font-size: .78rem;
+      color: #334155;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .toolbar .tool-url {
+      width: 190px;
+      min-width: 130px;
+      font-size: .82rem;
+    }
+
+    .toolbar .tool-alt {
+      width: 120px;
+      min-width: 100px;
+      font-size: .82rem;
+    }
+
+    .toolbar .tool-block {
+      width: 180px;
+      min-width: 140px;
+      font-size: .82rem;
     }
 
     .toolbar .sep {
@@ -262,6 +288,27 @@
           <button type="button" class="btn" data-cmd="justifyLeft" title="Rata Kiri">↤</button>
           <button type="button" class="btn" data-cmd="justifyCenter" title="Rata Tengah">↔</button>
           <button type="button" class="btn" data-cmd="justifyRight" title="Rata Kanan">↦</button>
+
+          <div class="sep"></div>
+
+          <span class="group">
+            <span class="tool-label">Image Link</span>
+            <input id="image-url" class="tool-url" type="text" placeholder="https://..." title="URL Gambar" />
+            <input id="image-alt" class="tool-alt" type="text" placeholder="Alt text" title="Alt Text" />
+            <button type="button" class="btn" id="insert-image" title="Sisipkan Gambar">Img+</button>
+          </span>
+
+          <span class="group">
+            <span class="tool-label">Section Block</span>
+            <select id="block-template" class="tool-block" title="Pilih Block Interaktif">
+              <option value="">Pilih block...</option>
+              <option value="hero-cta">Hero CTA</option>
+              <option value="feature-cards">Feature Cards</option>
+              <option value="faq-accordion">FAQ Accordion</option>
+              <option value="testi-highlight">Testimoni Highlight</option>
+            </select>
+            <button type="button" class="btn" id="insert-block" title="Sisipkan Block">Block+</button>
+          </span>
         </div>
 
         <iframe id="preview-frame" title="Live Preview" class="preview-frame" sandbox="allow-scripts allow-modals"></iframe>
@@ -332,6 +379,11 @@
       const fontSize = document.getElementById('font-size');
       const textColor = document.getElementById('text-color');
       const bgColor = document.getElementById('bg-color');
+      const imageUrlInput = document.getElementById('image-url');
+      const imageAltInput = document.getElementById('image-alt');
+      const insertImageBtn = document.getElementById('insert-image');
+      const blockTemplate = document.getElementById('block-template');
+      const insertBlockBtn = document.getElementById('insert-block');
 
       let htmlCode = defaultCode;
       let iframeCode = defaultCode;
@@ -416,6 +468,99 @@
     reselectNodeContents(wrapper);
   }
 
+  function sanitizeImageUrl(url) {
+    var raw = String(url || '').trim();
+    if (!raw) return '';
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (/^\//.test(raw)) return raw;
+    return '';
+  }
+
+  function insertHtmlAtSelection(html) {
+    var sel = window.getSelection();
+    if (!sel) return;
+
+    if (sel.rangeCount === 0) {
+      if (document.body) {
+        document.body.insertAdjacentHTML('beforeend', html);
+      }
+      return;
+    }
+
+    var range = sel.getRangeAt(0);
+    range.deleteContents();
+
+    var container = document.createElement('div');
+    container.innerHTML = html;
+    var frag = document.createDocumentFragment();
+    var lastNode = null;
+    while (container.firstChild) {
+      lastNode = frag.appendChild(container.firstChild);
+    }
+
+    range.insertNode(frag);
+
+    if (lastNode) {
+      var after = document.createRange();
+      after.setStartAfter(lastNode);
+      after.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(after);
+      savedRange = after.cloneRange();
+    }
+  }
+
+  function buildInteractiveBlock(templateKey) {
+    var stamp = Date.now();
+
+    if (templateKey === 'hero-cta') {
+      return '<section data-live-block="hero-cta" style="padding:28px;margin:14px 0;border-radius:16px;border:1px solid #c7d2fe;background:linear-gradient(135deg,#eef2ff,#ffffff);">'
+        + '<h2 style="margin:0 0 8px;color:#312e81;">Judul Hero yang Menarik</h2>'
+        + '<p style="margin:0 0 14px;color:#4338ca;">Tambahkan value proposition singkat agar user langsung paham manfaat utama.</p>'
+        + '<a href="#" style="display:inline-block;background:#4f46e5;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700;">Klik CTA</a>'
+        + '</section>';
+    }
+
+    if (templateKey === 'feature-cards') {
+      return '<section data-live-block="feature-cards" style="margin:16px 0;">'
+        + '<h3 style="margin:0 0 12px;color:#0f172a;">Fitur Unggulan</h3>'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">'
+        + '<article style="padding:14px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.06);"><strong style="color:#1d4ed8;">Cepat</strong><p style="margin:8px 0 0;color:#475569;">Setup ringkas dan mudah dipahami.</p></article>'
+        + '<article style="padding:14px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.06);"><strong style="color:#1d4ed8;">Interaktif</strong><p style="margin:8px 0 0;color:#475569;">Elemen mudah diedit langsung di preview.</p></article>'
+        + '<article style="padding:14px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.06);"><strong style="color:#1d4ed8;">Sinkron</strong><p style="margin:8px 0 0;color:#475569;">HTML source otomatis ikut berubah.</p></article>'
+        + '</div>'
+        + '</section>';
+    }
+
+    if (templateKey === 'faq-accordion') {
+      return '<section data-live-block="faq-accordion" style="margin:16px 0;padding:14px;border:1px solid #dbeafe;border-radius:14px;background:#eff6ff;">'
+        + '<h3 style="margin:0 0 10px;color:#1e3a8a;">FAQ Interaktif</h3>'
+        + '<details style="margin-bottom:8px;background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 10px;"><summary style="cursor:pointer;font-weight:700;color:#1d4ed8;">Pertanyaan 1</summary><p style="margin:8px 0 0;color:#334155;">Jawaban singkat untuk pertanyaan pertama.</p></details>'
+        + '<details style="background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 10px;"><summary style="cursor:pointer;font-weight:700;color:#1d4ed8;">Pertanyaan 2</summary><p style="margin:8px 0 0;color:#334155;">Jawaban singkat untuk pertanyaan kedua.</p></details>'
+        + '</section>';
+    }
+
+    if (templateKey === 'testi-highlight') {
+      return '<section data-live-block="testi-highlight" style="margin:16px 0;padding:18px;border-left:5px solid #22c55e;border-radius:12px;background:#f0fdf4;">'
+        + '<h3 style="margin:0 0 8px;color:#166534;">Testimoni Pengguna</h3>'
+        + '<blockquote style="margin:0;color:#14532d;font-style:italic;">"Produk ini bikin workflow saya jauh lebih cepat dan rapi."</blockquote>'
+        + '<p style="margin:10px 0 0;color:#15803d;font-weight:700;">— Nama Pengguna #' + stamp + '</p>'
+        + '</section>';
+    }
+
+    return '';
+  }
+
+  function insertImageByLink(payload) {
+    var rawUrl = payload && payload.url;
+    var safeUrl = sanitizeImageUrl(rawUrl);
+    if (!safeUrl) return;
+
+    var alt = String((payload && payload.alt) || 'Gambar').replace(/"/g, '&quot;');
+    var html = '<img src="' + safeUrl + '" alt="' + alt + '" style="max-width:100%;height:auto;border-radius:10px;display:block;margin:12px 0;" />';
+    insertHtmlAtSelection(html);
+  }
+
   if (document.body) {
     document.body.contentEditable = 'true';
     document.body.style.outline = 'none';
@@ -461,6 +606,11 @@
         applyColorWithImportant('color', val);
       } else if (cmd === 'hiliteColor' && val) {
         applyColorWithImportant('background-color', val);
+      } else if (cmd === 'insertImageByUrl') {
+        insertImageByLink(val || {});
+      } else if (cmd === 'insertBlockTemplate') {
+        var blockHtml = buildInteractiveBlock(String(val || ''));
+        if (blockHtml) insertHtmlAtSelection(blockHtml);
       } else {
         document.execCommand(cmd, false, val);
       }
@@ -529,11 +679,40 @@
         applyFormat('hiliteColor', bgColor.value);
       }
 
+      function insertImageFromToolbar() {
+        var url = imageUrlInput.value.trim();
+        if (!url) return;
+        applyFormat('insertImageByUrl', { url: url, alt: imageAltInput.value.trim() });
+        imageUrlInput.focus();
+      }
+
+      function insertInteractiveBlock() {
+        if (!blockTemplate.value) return;
+        applyFormat('insertBlockTemplate', blockTemplate.value);
+      }
+
       textColor.addEventListener('input', applyTextColor);
       textColor.addEventListener('change', applyTextColor);
 
       bgColor.addEventListener('input', applyBgColor);
       bgColor.addEventListener('change', applyBgColor);
+
+      insertImageBtn.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        insertImageFromToolbar();
+      });
+
+      imageUrlInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          insertImageFromToolbar();
+        }
+      });
+
+      insertBlockBtn.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        insertInteractiveBlock();
+      });
 
       htmlCode = defaultCode;
       iframeCode = defaultCode;
