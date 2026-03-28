@@ -1,0 +1,14 @@
+# Installer output artifacts
+installer/
+
+# Optional alternative packaging output
+build/
+
+# Local runtime/cache artifacts
+.wrangler/
+.sisyphus/
+
+# Unrelated local workspaces
+context-skills/
+q3ok-agent/
+volt-agent/

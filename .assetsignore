@@ -1,0 +1,24 @@
+# Prevent non-public/source files from being uploaded as static assets
+.git/
+.github/
+.wrangler/
+node_modules/
+installer/
+scripts/
+
+# Local artifacts
+playwright-live-*.png
+*.log
+
+# Source and operational files not meant for public access
+*.md
+*.jsonc
+setup.js
+validate-config.js
+validate-seo.js
+load_test.js
+appscript.js
+wrangler.jsonc
+package.json
+package-lock.json
+jest.config.js
