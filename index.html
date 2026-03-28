@@ -383,6 +383,39 @@
     }
   }
 
+  function reselectNodeContents(node) {
+    if (!node) return;
+    var sel = window.getSelection();
+    if (!sel) return;
+    var range = document.createRange();
+    range.selectNodeContents(node);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    savedRange = range.cloneRange();
+  }
+
+  function applyColorWithImportant(propertyName, colorValue) {
+    var sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+
+    var range = sel.getRangeAt(0);
+    if (range.collapsed) return;
+
+    var wrapper = document.createElement('span');
+    wrapper.setAttribute('data-live-editor-color', '1');
+    wrapper.style.setProperty(propertyName, colorValue, 'important');
+
+    try {
+      range.surroundContents(wrapper);
+    } catch (e) {
+      var frag = range.extractContents();
+      wrapper.appendChild(frag);
+      range.insertNode(wrapper);
+    }
+
+    reselectNodeContents(wrapper);
+  }
+
   if (document.body) {
     document.body.contentEditable = 'true';
     document.body.style.outline = 'none';
@@ -419,9 +452,20 @@
     if (!event.data || event.data.type !== 'FORMAT') return;
     window.focus();
     restoreSelection();
+
+    var cmd = event.data.command;
+    var val = event.data.value || null;
+
     try {
-      document.execCommand(event.data.command, false, event.data.value || null);
+      if (cmd === 'foreColor' && val) {
+        applyColorWithImportant('color', val);
+      } else if (cmd === 'hiliteColor' && val) {
+        applyColorWithImportant('background-color', val);
+      } else {
+        document.execCommand(cmd, false, val);
+      }
     } catch (err) {}
+
     captureSelection();
     sanitizeAndEmit();
   });
@@ -477,13 +521,19 @@
         applyFormat('fontSize', fontSize.value);
       });
 
-      textColor.addEventListener('input', function () {
+      function applyTextColor() {
         applyFormat('foreColor', textColor.value);
-      });
+      }
 
-      bgColor.addEventListener('input', function () {
+      function applyBgColor() {
         applyFormat('hiliteColor', bgColor.value);
-      });
+      }
+
+      textColor.addEventListener('input', applyTextColor);
+      textColor.addEventListener('change', applyTextColor);
+
+      bgColor.addEventListener('input', applyBgColor);
+      bgColor.addEventListener('change', applyBgColor);
 
       htmlCode = defaultCode;
       iframeCode = defaultCode;
