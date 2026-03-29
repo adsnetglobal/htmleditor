@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZHOST — Toko Produk Digital Otomatis, Tanpa Hosting Bulanan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --bg-elevated: #f3f4f6;
+      --fg: #1a1a2e;
+      --fg-muted: #4b5563;
+      --fg-dim: #9ca3af;
+      --accent: #059669;
+      --accent-hover: #047857;
+      --accent-light: #ecfdf5;
+      --accent-border: rgba(5,150,105,0.2);
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --danger-light: #fef2f2;
+      --max-w: 680px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Plus Jakarta Sans',sans-serif;
+      background:var(--bg);
+      color:var(--fg);
+      font-size:1rem;
+      line-height:1.7;
+      -webkit-font-smoothing:antialiased;
+    }
+    p, li, span { text-align:left; }
+    .container { max-width:var(--max-w); margin:0 auto; padding:0 20px; }
+    h1 { font-size:1.85rem; font-weight:800; line-height:1.25; letter-spacing:-0.02em; color:var(--fg); }
+    h2 { font-size:1.5rem; font-weight:700; line-height:1.3; letter-spacing:-0.01em; color:var(--fg); }
+    h3 { font-size:1.1rem; font-weight:700; line-height:1.4; color:var(--fg); }
+    p { margin-bottom:1rem; color:var(--fg-muted); }
+    section { padding:56px 0; }
+    .section-divider { border:none; border-top:1px solid var(--border); margin:0; }
+    a { color:var(--accent); text-decoration:none; }
+
+    .cta-btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      background:var(--accent); color:#fff; font-weight:700;
+      padding:18px 36px; border-radius:12px; font-size:1.05rem;
+      border:none; cursor:pointer; transition:all 0.25s ease;
+      text-decoration:none; width:100%; box-shadow:0 4px 16px rgba(5,150,105,0.25);
+    }
+    .cta-btn:hover { background:var(--accent-hover); transform:translateY(-2px); box-shadow:0 6px 24px rgba(5,150,105,0.3); }
+    .cta-btn svg { flex-shrink:0; }
+    .cta-btn, .cta-btn span { color:#fff !important; }
+
+    .cta-trust {
+      display:flex; flex-wrap:wrap; justify-content:center; gap:16px;
+      margin-top:14px; font-size:0.8rem; color:var(--fg-dim);
+    }
+    .cta-trust span { display:flex; align-items:center; gap:5px; }
+
+    .card {
+      background:var(--bg-card); border:1px solid var(--border);
+      border-radius:16px; padding:28px; margin-bottom:16px;
+      box-shadow:var(--shadow-sm);
+    }
+    .card-accent {
+      border-color:var(--accent-border);
+      background:var(--accent-light);
+    }
+
+    .benefit-item {
+      display:flex; align-items:flex-start; gap:12px;
+      padding:14px 0; border-bottom:1px solid var(--border);
+    }
+    .benefit-item:last-child { border-bottom:none; }
+    .benefit-icon { flex-shrink:0; font-size:1.1rem; margin-top:2px; color:var(--accent); }
+    .benefit-text { color:var(--fg); font-size:0.95rem; }
+    .benefit-text strong { color:var(--accent); font-weight:600; }
+
+    .pain-item {
+      display:flex; align-items:center; gap:10px;
+      padding:8px 0; color:var(--fg-dim); font-size:0.9rem;
+    }
+    .pain-icon { color:var(--danger); flex-shrink:0; }
+
+    .flow-step {
+      display:flex; align-items:center; gap:14px;
+      padding:16px 20px; background:var(--bg-card);
+      border:1px solid var(--border); border-radius:12px; margin-bottom:8px;
+      box-shadow:var(--shadow-sm);
+    }
+    .flow-num {
+      width:36px; height:36px; background:var(--accent); color:#fff;
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:0.85rem; flex-shrink:0;
+    }
+    .flow-text { color:var(--fg-muted); font-size:0.95rem; }
+    .flow-arrow { text-align:center; color:var(--accent); font-size:1.2rem; margin:4px 0; }
+    .flow-highlight { border-color:var(--accent); background:var(--accent-light); }
+    .flow-highlight .flow-text { color:var(--fg); font-weight:600; }
+
+    .offer-item {
+      display:flex; justify-content:space-between; align-items:baseline;
+      padding:12px 0; border-bottom:1px solid var(--border); font-size:0.95rem;
+    }
+    .offer-item:last-child { border-bottom:none; }
+    .offer-name { color:var(--fg); }
+    .offer-bonus .offer-name { color:var(--accent); font-weight:600; }
+
+    .price-block { text-align:center; padding:32px 0 16px; }
+    .price-new { font-size:3rem; font-weight:800; color:var(--accent); margin:8px 0; }
+    .price-note { font-size:0.9rem; color:var(--fg-dim); }
+
+    /* Testimoni section */
+    .testi-card {
+      background:var(--bg-card); border:1px solid var(--border);
+      border-radius:16px; padding:24px; margin-bottom:16px;
+      box-shadow:var(--shadow-sm);
+    }
+    .testi-quote {
+      font-size:1rem; line-height:1.7; color:var(--fg);
+      margin-bottom:16px; font-style:italic;
+      border-left:3px solid var(--accent); padding-left:16px;
+    }
+    .testi-author { font-size:0.85rem; color:var(--fg-dim); }
+    .testi-author strong { color:var(--fg-muted); font-weight:600; }
+    .testi-image {
+      width:100%; border-radius:12px; overflow:hidden;
+      margin-bottom:20px; border:1px solid var(--border);
+    }
+    .testi-image img { width:100%; height:auto; display:block; }
+
+    .faq-item {
+      border-bottom:1px solid var(--border);
+      padding:20px 0; cursor:pointer;
+    }
+    .faq-q {
+      display:flex; justify-content:space-between; align-items:center;
+      font-weight:600; font-size:1rem; color:var(--fg);
+    }
+    .faq-arrow { transition:transform 0.3s ease; color:var(--fg-dim); font-size:1.2rem; }
+    .faq-item.active .faq-arrow { transform:rotate(180deg); color:var(--accent); }
+    .faq-a {
+      max-height:0; overflow:hidden; transition:max-height 0.4s ease;
+      color:var(--fg-muted); font-size:0.9rem; line-height:1.7;
+    }
+    .faq-item.active .faq-a { max-height:300px; }
+    .faq-a p { margin-top:12px; margin-bottom:0; }
+
+    .badge {
+      display:inline-flex; align-items:center; gap:6px;
+      background:var(--accent-light); border:1px solid var(--accent-border);
+      color:var(--accent); font-size:0.78rem; font-weight:600;
+      padding:6px 14px; border-radius:50px; margin-bottom:20px;
+    }
+
+    .guarantee-box {
+      border:2px solid var(--accent); border-radius:16px;
+      padding:32px; text-align:center; background:var(--bg-card);
+      box-shadow:var(--shadow-md);
+    }
+    .guarantee-box h3 { color:var(--accent); margin-bottom:12px; }
+    .guarantee-box p { color:var(--fg-muted); font-size:0.95rem; }
+
+    .creator-row {
+      display:flex; align-items:center; gap:16px;
+      padding:20px; background:var(--bg-card);
+      border:1px solid var(--border); border-radius:14px;
+      box-shadow:var(--shadow-sm);
+    }
+    .creator-avatar {
+      width:56px; height:56px; border-radius:50%; overflow:hidden; flex-shrink:0;
+      border:2px solid var(--accent);
+    }
+    .creator-avatar img { width:100%; height:100%; object-fit:cover; }
+    .creator-name { font-weight:700; font-size:0.95rem; color:var(--fg); }
+    .creator-title { font-size:0.8rem; color:var(--fg-dim); }
+    .creator-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:0.72rem; font-weight:600; color:var(--accent);
+      background:var(--accent-light); padding:3px 10px; border-radius:20px;
+      margin-top:4px;
+    }
+
+    .sticky-cta {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--accent); padding:14px 20px;
+      z-index:9999; display:none; text-align:center;
+      box-shadow:0 -4px 24px rgba(0,0,0,0.12);
+      border-top:1px solid rgba(255,255,255,0.15);
+    }
+    .sticky-cta a { color:#fff !important; font-weight:700; font-size:1rem; text-decoration:none; display:block; }
+
+    .reveal { opacity:0; transform:translateY(30px); transition:all 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.active { opacity:1; transform:translateY(0); }
+    @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+    @media(min-width:768px) {
+      h1 { font-size:2.6rem; }
+      h2 { font-size:1.85rem; }
+      section { padding:72px 0; }
+    }
+
+    footer { padding:32px 0; border-top:1px solid var(--border); text-align:center; }
+    footer p { font-size:0.78rem; color:var(--fg-dim); }
+  </style>
+</head>
+<body>
+
+<!-- ====== PHASE 1: BRIDGE ====== -->
+
+<section style="padding-top:48px; padding-bottom:40px;">
+  <div class="container">
+    <div class="reveal">
+      <div class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        50+ penjual digital sudah pakai
+      </div>
+
+      <h1>Toko Produk Digital Sendiri — Otomatis Semua, Tanpa Hosting Bulanan</h1>
+
+      <p style="font-size:1.1rem; color:var(--fg-muted); margin-top:16px; margin-bottom:8px;">
+        Untuk penjual ebook, template, dan produk digital yang capek cek mutasi dan kirim file manual via WA.
+      </p>
+      <p style="font-size:1.1rem; color:var(--fg); font-weight:600; margin-bottom:28px;">
+        Sekali bayar Rp 197.000 — besok toko lu udah live.
+      </p>
+
+      <a href="https://cepat.digital/zhost-co" class="cta-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Ambil ZHOST — Rp 197.000</span>
+      </a>
+      <div class="cta-trust">
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Akses Instan</span>
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Sekali Bayar</span>
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Garansi Instalasi</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIENCE QUALIFIER -->
+<section style="padding:32px 0; background:var(--bg-elevated);">
+  <div class="container">
+    <div class="reveal">
+      <h2 style="margin-bottom:20px;">Ini untuk kamu yang:</h2>
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10003;</span>
+        <span class="benefit-text">Sudah jualan ebook, template, atau produk digital — tapi <strong>masih kirim file manual via WA</strong></span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10003;</span>
+        <span class="benefit-text">Cek mutasi m-banking <strong>3-4x sehari</strong> cuma buat verifikasi transfer</span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10003;</span>
+        <span class="benefit-text">Udah punya pembeli tapi <strong>prosesnya masih manual</strong> dari verifikasi sampai kirim file</span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10003;</span>
+        <span class="benefit-text">Pengen upgrade ke toko sendiri tapi <strong>gak mau bayar Rp 100-200rb tiap bulan</strong> buat hosting</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRIDGE STATEMENT + Cara Kerja -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <h2 style="margin-bottom:12px;">ZHOST Bukan Sekadar Template Website</h2>
+      <p>
+        Ini script lengkap yang bikin penjual produk digital punya toko sendiri — dengan auto-payment, membership area, dan sistem affiliate. Tanpa sewa server, tanpa cPanel, tanpa biaya bulanan.
+      </p>
+
+      <h3 style="margin:28px 0 16px;">Cara kerjanya:</h3>
+      <div class="flow-step">
+        <span class="flow-num">1</span>
+        <span class="flow-text">Buyer transfer ke rekening kamu</span>
+      </div>
+      <div class="flow-arrow">&#8595;</div>
+      <div class="flow-step">
+        <span class="flow-num">2</span>
+        <span class="flow-text">Sistem baca mutasi otomatis via Moota</span>
+      </div>
+      <p style="font-size:0.8rem; color:var(--fg-dim); padding-left:52px; margin:4px 0 4px;">
+        Moota = layanan auto-cek mutasi pihak ketiga. Ada paket gratis dan berbayar — biaya terpisah dari ZHOST, mengikuti kebijakan Moota.
+      </p>
+      <div class="flow-arrow">&#8595;</div>
+      <div class="flow-step">
+        <span class="flow-num">3</span>
+        <span class="flow-text">Status LUNAS — akses + notifikasi WA terkirim otomatis</span>
+      </div>
+      <div class="flow-arrow">&#8595;</div>
+      <div class="flow-step flow-highlight">
+        <span class="flow-num" style="background:var(--accent-hover);">&#10003;</span>
+        <span class="flow-text">Kamu gak sentuh apa-apa. Semua otomatis. 24/7.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ====== PHASE 2: PROOF ====== -->
+
+<!-- FITUR sebagai OUTCOME -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <h2 style="margin-bottom:24px;">Yang berubah setelah pakai ZHOST:</h2>
+
+      <div class="card card-accent" style="margin-bottom:12px;">
+        <h3 style="margin-bottom:4px;">Verifikasi otomatis 24/7</h3>
+        <p style="margin-bottom:0; font-size:0.9rem;">Transfer masuk jam berapapun — tengah malam, subuh — langsung otomatis. Buyer gak pernah nunggu lagi.</p>
+      </div>
+      <div class="card card-accent" style="margin-bottom:12px;">
+        <h3 style="margin-bottom:4px;">Toko dengan brand sendiri</h3>
+        <p style="margin-bottom:0; font-size:0.9rem;">Domain kamu, logo kamu, nama kamu. Full white-label. Bukan numpang di platform orang.</p>
+      </div>
+      <div class="card card-accent" style="margin-bottom:12px;">
+        <h3 style="margin-bottom:4px;">Rp 0 biaya bulanan</h3>
+        <p style="margin-bottom:0; font-size:0.9rem;">Tanpa hosting, tanpa sewa server, tanpa cPanel. Cuma butuh 1 domain pribadi.</p>
+      </div>
+      <div class="card card-accent" style="margin-bottom:12px;">
+        <h3 style="margin-bottom:4px;">Membership area + affiliate built-in</h3>
+        <p style="margin-bottom:0; font-size:0.9rem;">Buyer yang sudah bayar langsung masuk area eksklusif. Orang lain bisa jualin, komisi otomatis tercatat.</p>
+      </div>
+      <div class="card card-accent">
+        <h3 style="margin-bottom:4px;">Notifikasi WA gratis</h3>
+        <p style="margin-bottom:0; font-size:0.9rem;">Setiap orderan masuk, notifikasi langsung ke WhatsApp. Tanpa sewa WA gateway bulanan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF — Testimoni dengan gambar -->
+<section style="background:var(--bg-elevated);">
+  <div class="container">
+    <div class="reveal">
+      <div class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Sudah dipakai & terbukti
+      </div>
+      <h2 style="margin-bottom:24px;">Kata mereka yang sudah pakai ZHOST</h2>
+
+      <!-- Testimoni image — bukti dashboard transaksi -->
+      <div class="testi-card">
+        <div class="testi-image">
+          <img src="https://res.cloudinary.com/dy1pggd3r/image/upload/v1773151727/testizhost_kynviv.jpg" alt="Bukti transaksi ZHOST — Dashboard otomatis" loading="lazy">
+        </div>
+        <p style="font-size:0.85rem; color:var(--fg-dim); margin-bottom:0; text-align:center;">
+          Bukti dashboard transaksi ZHOST — semua terverifikasi otomatis, tanpa cek mutasi manual.
+        </p>
+      </div>
+
+      <!-- Testimoni buyer real -->
+      <div class="testi-card">
+        <div class="testi-quote">
+          "Setup cuma 2 jam ikutin video tutorial. Besoknya udah ada yang beli lewat web. Gak nyangka bisa punya toko sendiri secepet ini. Dan beneran gak ada biaya bulanan."
+        </div>
+        <div class="testi-author">
+          <strong>Rina Wahyuni</strong> — Penjual Template Canva
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-quote">
+          "Dulu sehari bisa 15x bolak-balik WA kirim file. Sekarang semua otomatis. Transfer masuk, buyer langsung dapet akses. Saya fokus bikin produk baru aja."
+        </div>
+        <div class="testi-author">
+          <strong>Dimas Prasetyo</strong> — Penjual Ebook Bisnis
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-quote">
+          "Yang paling kerasa: gak perlu cek mutasi lagi. Dulu anxiety tiap ada notif WA 'kak udah transfer'. Sekarang sistem yang handle semua."
+        </div>
+        <div class="testi-author">
+          <strong>Sari Melati</strong> — Penjual Preset Lightroom
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDIBILITY — Creator -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <h2 style="margin-bottom:20px;">Siapa di balik ZHOST</h2>
+      <div class="creator-row">
+        <div class="creator-avatar">
+          <img src="https://res.cloudinary.com/dy1pggd3r/image/upload/v1773241779/Foto_berna_circle_new_rrd5tb.png" alt="Andhya Berna" loading="lazy">
+        </div>
+        <div>
+          <div class="creator-name">Andhya Berna</div>
+          <div class="creator-title">Digital Creator & Meta Ads Advertiser</div>
+          <div class="creator-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Recommended Seller Scalev.id
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:16px; font-size:0.9rem;">
+        Praktisi Meta Ads yang masih aktif jalankan iklan setiap hari. ZHOST lahir dari kebutuhan sendiri — butuh sistem jualan produk digital yang otomatis, tanpa ribet hosting, dan gak ada biaya berlangganan.
+      </p>
+      <p style="font-size:0.9rem;">
+        Terpilih sebagai Top 100 Seller di Scalev.id dan direkomendasikan langsung oleh Army Alghifari (Founder Scalev).
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ====== PHASE 3: STACK ====== -->
+
+<section style="background:var(--bg-elevated);">
+  <div class="container">
+    <div class="reveal">
+      <h2 style="margin-bottom:24px;">Dengan ZHOST, kamu bisa:</h2>
+
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10004;</span>
+        <span class="benefit-text">Terima pembayaran otomatis — transfer masuk, <strong>status LUNAS, akses terkirim</strong></span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10004;</span>
+        <span class="benefit-text">Punya toko digital sendiri dengan <strong>domain dan brand kamu</strong></span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10004;</span>
+        <span class="benefit-text">Kelola member, produk, dan transaksi dari <strong>satu dashboard</strong></span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">&#10004;</span>
+        <span class="benefit-text">Aktifkan affiliate — orang lain bantu jualin, <strong>komisi otomatis tercatat</strong></span>
+      </div>
+
+      <h3 style="margin:28px 0 16px; color:var(--fg-muted);">Tanpa harus:</h3>
+
+      <div class="pain-item"><span class="pain-icon">&#10007;</span> Cek mutasi manual 3-4x sehari</div>
+      <div class="pain-item"><span class="pain-icon">&#10007;</span> Kirim file satu-satu via WA</div>
+      <div class="pain-item"><span class="pain-icon">&#10007;</span> Bayar hosting Rp 100-200rb tiap bulan</div>
+      <div class="pain-item"><span class="pain-icon">&#10007;</span> Belajar setup cPanel atau coding</div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFER STACK -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <h2 style="margin-bottom:24px;">Yang kamu dapatkan:</h2>
+
+      <div class="card">
+        <div class="offer-item">
+          <span class="offer-name">ZHOST V2 Script — toko produk digital otomatis</span>
+        </div>
+        <div class="offer-item">
+          <span class="offer-name">Video tutorial instalasi step-by-step (6 modul)</span>
+        </div>
+        <div class="offer-item">
+          <span class="offer-name">Unlimited domain & landing page</span>
+        </div>
+        <div class="offer-item">
+          <span class="offer-name">WA Gateway gratis (tanpa sewa bulanan)</span>
+        </div>
+        <div class="offer-item">
+          <span class="offer-name">Group diskusi + support instalasi</span>
+        </div>
+        <div class="offer-item offer-bonus">
+          <span class="offer-name">+ 10 produk digital siap jual (lisensi bebas)</span>
+        </div>
+        <div class="offer-item offer-bonus">
+          <span class="offer-name">+ 3 GPT Marketing Tools</span>
+        </div>
+        <div class="offer-item offer-bonus">
+          <span class="offer-name">+ 3 GPT Bisnis Tools</span>
+        </div>
+        <div class="offer-item offer-bonus">
+          <span class="offer-name">+ Script Web Produk Fisik (tanpa hosting)</span>
+        </div>
+        <div class="offer-item offer-bonus">
+          <span class="offer-name">+ Script Web Klinik Kecantikan (tanpa hosting)</span>
+        </div>
+        <div class="offer-item offer-bonus">
+          <span class="offer-name">+ Script Web Umroh (tanpa hosting)</span>
+        </div>
+        <div class="offer-item offer-bonus">
+          <span class="offer-name">+ Tutorial AI Builder gratis</span>
+        </div>
+      </div>
+
+      <div class="price-block">
+        <div class="price-note">Semua di atas, dengan harga:</div>
+        <div class="price-new">Rp 197.000</div>
+        <div class="price-note">Sekali bayar. Akses selamanya. Rp 0 biaya bulanan.</div>
+      </div>
+
+      <a href="https://cepat.digital/zhost-co" class="cta-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Ambil ZHOST Sekarang — Rp 197.000</span>
+      </a>
+      <div class="cta-trust">
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Akses Instan</span>
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Sekali Bayar</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RISK REVERSAL -->
+<section style="background:var(--bg-elevated);">
+  <div class="container">
+    <div class="reveal">
+      <div class="guarantee-box">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" style="margin-bottom:16px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h3>Garansi: Website Kamu Pasti Live</h3>
+        <p style="margin-bottom:8px;">
+          Ikuti video tutorial dulu. Kalau masih stuck, saya bantu langsung sampai website kamu benar-benar live dan siap terima pembayaran.
+        </p>
+        <p style="margin-bottom:0; color:var(--fg); font-weight:600; font-size:0.9rem;">
+          Kamu beli ZHOST = kamu pasti punya toko jualan produk digital yang live. Itu komitmen saya.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ====== PHASE 4: CLOSE ====== -->
+
+<section>
+  <div class="container">
+    <div class="reveal">
+      <h2 style="margin-bottom:24px;">Yang sering ditanyakan</h2>
+      <div id="faq-container"></div>
+    </div>
+  </div>
+</section>
+
+<!-- DISQUALIFIER -->
+<section style="padding:24px 0;">
+  <div class="container">
+    <div class="reveal">
+      <div class="card" style="border-color:rgba(220,38,38,0.15); background:var(--danger-light);">
+        <p style="font-size:0.88rem; color:var(--fg-muted); margin-bottom:8px;">
+          <strong style="color:var(--danger);">Penting:</strong> ZHOST adalah SISTEM jualan, bukan pembuat produk. Kamu sudah harus punya produk digital yang siap dijual — ZHOST bantu otomasi dan profesionalisasi tokonya.
+        </p>
+        <p style="font-size:0.85rem; color:var(--fg-dim); margin-bottom:0;">
+          Bonus 10 produk digital termasuk sebagai starter kit kalau kamu mau tambah katalog.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section style="background:var(--bg-elevated); padding:56px 0;">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <h2 style="margin-bottom:16px;">Stop cek mutasi manual.<br>Punya toko digital sendiri. Otomatis semua.</h2>
+      <p style="margin-bottom:28px; font-size:1rem;">
+        Satu kali bayar Rp 197.000. Besok toko kamu udah live.
+      </p>
+
+      <a href="https://cepat.digital/zhost-co" class="cta-btn" style="max-width:480px; margin:0 auto;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Ambil ZHOST Sekarang — Rp 197.000</span>
+      </a>
+      <div class="cta-trust">
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Akses Instan</span>
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Sekali Bayar</span>
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Garansi Live Web</span>
+      </div>
+
+      <p style="font-size:0.82rem; color:var(--danger); margin-top:20px; font-weight:600;">
+        Harga bisa naik sewaktu-waktu tanpa pemberitahuan.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>&copy; 2026 ZHOST by Andhya Berna. Script toko produk digital tanpa hosting.</p>
+  </div>
+</footer>
+
+<!-- Sticky Mobile CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <a href="https://cepat.digital/zhost-co">Ambil ZHOST — Rp 197.000</a>
+</div>
+
+<script>
+  var faqData = [
+    {q:"Apakah benar tanpa hosting bulanan?",a:"Ya. ZHOST berjalan tanpa hosting tradisional. Kamu hanya perlu 1 domain pribadi. Tidak ada biaya server bulanan, tidak ada cPanel."},
+    {q:"Bagaimana cara auto-payment-nya?",a:"ZHOST terintegrasi dengan Moota. Setiap transfer masuk ke rekening kamu, sistem otomatis baca mutasi dan ubah status jadi LUNAS. Buyer langsung dapat akses + notifikasi WA. Moota punya biaya terpisah (ada paket gratis), dan bersifat opsional."},
+    {q:"Saya bukan teknis, bisa setup sendiri?",a:"Bisa. Ada video tutorial step-by-step dari nol sampai live (6 modul). Kalau masih stuck, ada garansi support instalasi — dibantu sampai web benar-benar live."},
+    {q:"Saya penjual ebook, apakah cocok?",a:"Sangat cocok. ZHOST dibuat khusus untuk penjual produk digital — ebook, template, preset, mini course. Sistem pembayaran otomatis, membership area, dan toko branded."},
+    {q:"Kalau webnya tidak live sesudah install?",a:"Ada garansi. Ikuti video tutorial dulu. Kalau masih stuck, hubungi langsung — dibantu sampai website benar-benar live dan siap terima pembayaran."},
+    {q:"Apa bedanya sama Scalev atau Lynk.id?",a:"Scalev dan Lynk.id adalah platform — kamu jualan di platform mereka, ada biaya bulanan atau fee per transaksi. ZHOST adalah script yang kamu install di domain sendiri. Sekali bayar, toko itu milik kamu sepenuhnya. Tidak ada fee per transaksi ke ZHOST, tidak ada biaya berlangganan."}
+  ];
+  var fc = document.getElementById('faq-container');
+  faqData.forEach(function(item) {
+    var el = document.createElement('div');
+    el.className = 'faq-item';
+    el.innerHTML = '<div class="faq-q"><span>' + item.q + '</span><span class="faq-arrow">&#9662;</span></div><div class="faq-a"><p>' + item.a + '</p></div>';
+    el.addEventListener('click', function() {
+      var w = this.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(function(f){f.classList.remove('active')});
+      if(!w) this.classList.add('active');
+    });
+    fc.appendChild(el);
+  });
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if(entry.isIntersecting) entry.target.classList.add('active');
+    });
+  }, {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el)});
+
+  // Fallback: force reveal if IntersectionObserver doesn't fire (e.g. in iframe/preview)
+  setTimeout(function(){
+    document.querySelectorAll('.reveal:not(.active)').forEach(function(el){el.classList.add('active')});
+  }, 800);
+
+  var stickyCta = document.getElementById('stickyCta');
+  var hero = document.querySelector('section');
+  if(window.innerWidth <= 768) {
+    new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        stickyCta.style.display = entry.isIntersecting ? 'none' : 'block';
+      });
+    }, {threshold:0.1}).observe(hero);
+  }
+</script>
+
+</body>
+</html>
