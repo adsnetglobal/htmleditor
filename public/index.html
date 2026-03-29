@@ -391,6 +391,16 @@
       function disableUserScriptsForPreview(code) {
         return String(code || '').replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, function (_full, attrs, body) {
           const cleanedAttrs = String(attrs || '').replace(/\sdata-user-script\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '').replace(/\stype\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+
+          // Keep valid inline scripts so pages relying on progressive reveal/FAQ can render in preview.
+          // Disable only scripts with syntax errors to prevent total preview failure.
+          try {
+            new Function(String(body || ''));
+            return '<script' + cleanedAttrs + '>' + body + '<\\/script>';
+          } catch (_err) {
+            // Syntax-invalid scripts are disabled in preview, but restored back in source sync.
+          }
+
           return '<script' + cleanedAttrs + ' type="application/x-live-preview-disabled" data-user-script="1">' + body + '<\\/script>';
         });
       }
