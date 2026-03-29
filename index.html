@@ -715,6 +715,19 @@
     captureSelection();
     sanitizeAndEmit();
   });
+
+  // Force-reveal elements hidden by scroll animations (opacity:0)
+  // so all content is visible and editable in preview
+  setTimeout(function() {
+    var all = document.querySelectorAll('*');
+    for (var i = 0; i < all.length; i++) {
+      var cs = window.getComputedStyle(all[i]);
+      if (cs.opacity === '0') {
+        all[i].style.setProperty('opacity', '1', 'important');
+        all[i].style.setProperty('transform', 'none', 'important');
+      }
+    }
+  }, 300);
 })();
 <\/script>`;
 
