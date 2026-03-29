@@ -405,6 +405,7 @@
   window.prompt = function(){ return null; };
 
   var savedRange = null;
+  var lastEmittedCode = '';
 
   function captureSelection() {
     var sel = window.getSelection();
@@ -424,14 +425,40 @@
     var injected = clone.querySelectorAll('[data-live-editor="true"]');
     injected.forEach(function (node) { node.remove(); });
     var result = '<!DOCTYPE html>\\n' + clone.outerHTML;
+
+    if (result === lastEmittedCode) return;
+    lastEmittedCode = result;
+
     window.parent.postMessage({ type: 'UPDATE_FROM_PREVIEW', code: result }, '*');
+  }
+
+  function moveCaretToEditableEnd() {
+    if (!document.body) return;
+    var sel = window.getSelection();
+    if (!sel) return;
+
+    var range = document.createRange();
+    range.selectNodeContents(document.body);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    savedRange = range.cloneRange();
   }
 
   function restoreSelection() {
     var sel = window.getSelection();
-    if (savedRange && sel) {
+    if (!sel) return;
+
+    if (!savedRange || !savedRange.startContainer || !savedRange.startContainer.isConnected) {
+      moveCaretToEditableEnd();
+      return;
+    }
+
+    try {
       sel.removeAllRanges();
       sel.addRange(savedRange);
+    } catch (e) {
+      moveCaretToEditableEnd();
     }
   }
 
@@ -639,6 +666,11 @@
       function applyFormat(command, value) {
         if (!frame.contentWindow) return;
         frame.contentWindow.postMessage({ type: 'FORMAT', command: command, value: value || null }, '*');
+        setTimeout(function () {
+          try {
+            frame.contentWindow.focus();
+          } catch (e) {}
+        }, 0);
       }
 
       editor.addEventListener('input', function (e) {
@@ -650,13 +682,15 @@
       window.addEventListener('message', function (event) {
         if (!event.data || event.data.type !== 'UPDATE_FROM_PREVIEW') return;
         if (typeof event.data.code !== 'string') return;
+        if (event.data.code === htmlCode) return;
+        if (editor.value === event.data.code) return;
+        if (document.activeElement === editor) return;
         htmlCode = event.data.code;
         renderEditor();
       });
 
       toolbar.querySelectorAll('[data-cmd]').forEach(function (btn) {
-        btn.addEventListener('mousedown', function (e) {
-          e.preventDefault();
+        btn.addEventListener('click', function () {
           applyFormat(btn.getAttribute('data-cmd'));
         });
       });
@@ -697,8 +731,7 @@
       bgColor.addEventListener('input', applyBgColor);
       bgColor.addEventListener('change', applyBgColor);
 
-      insertImageBtn.addEventListener('mousedown', function (e) {
-        e.preventDefault();
+      insertImageBtn.addEventListener('click', function () {
         insertImageFromToolbar();
       });
 
@@ -709,8 +742,7 @@
         }
       });
 
-      insertBlockBtn.addEventListener('mousedown', function (e) {
-        e.preventDefault();
+      insertBlockBtn.addEventListener('click', function () {
         insertInteractiveBlock();
       });
 
