@@ -536,7 +536,8 @@
     if (!raw) return '';
     if (/^(https?:|mailto:|tel:)/i.test(raw)) return raw;
     if (/^[#/]/.test(raw)) return raw;
-    if (/^[a-z0-9.-]+\\.[a-z]{2,}(\\/.*)?$/i.test(raw)) return 'https://' + raw;
+    var hostCandidate = raw.split('/')[0];
+    if (hostCandidate.indexOf('.') > 0 && raw.indexOf(' ') === -1) return 'https://' + raw;
     return '';
   }
 
