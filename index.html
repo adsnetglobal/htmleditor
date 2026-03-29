@@ -388,6 +388,13 @@
       let htmlCode = defaultCode;
       let iframeCode = defaultCode;
 
+      function disableUserScriptsForPreview(code) {
+        return String(code || '').replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, function (_full, attrs, body) {
+          const cleanedAttrs = String(attrs || '').replace(/\sdata-user-script\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '').replace(/\stype\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+          return '<script' + cleanedAttrs + ' type="application/x-live-preview-disabled" data-user-script="1">' + body + '<\\/script>';
+        });
+      }
+
       function buildInjectedHtml(code) {
         const styleToInject = `
 <style data-live-editor="true">
@@ -424,6 +431,15 @@
     }
     var injected = clone.querySelectorAll('[data-live-editor="true"]');
     injected.forEach(function (node) { node.remove(); });
+
+    var disabledScripts = clone.querySelectorAll('script[data-user-script="1"]');
+    disabledScripts.forEach(function (node) {
+      if (node.getAttribute('type') === 'application/x-live-preview-disabled') {
+        node.removeAttribute('type');
+      }
+      node.removeAttribute('data-user-script');
+    });
+
     var result = '<!DOCTYPE html>\\n' + clone.outerHTML;
 
     if (result === lastEmittedCode) return;
@@ -649,10 +665,12 @@
 })();
 <\/script>`;
 
-        if (code.includes('</body>')) {
-          return code.replace('</body>', styleToInject + scriptToInject + '\n</body>');
+        const safeCode = disableUserScriptsForPreview(code);
+
+        if (safeCode.includes('</body>')) {
+          return safeCode.replace('</body>', styleToInject + scriptToInject + '\n</body>');
         }
-        return code + styleToInject + scriptToInject;
+        return safeCode + styleToInject + scriptToInject;
       }
 
       function renderEditor() {
