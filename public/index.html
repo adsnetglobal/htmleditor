@@ -508,6 +508,38 @@
     var range = sel.getRangeAt(0);
     if (range.collapsed) return;
 
+    var startEl = range.startContainer && (range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement);
+    var endEl = range.endContainer && (range.endContainer.nodeType === 1 ? range.endContainer : range.endContainer.parentElement);
+
+    var directStart = startEl && startEl.closest('[data-live-editor-color="1"], span, a, button');
+    var directEnd = endEl && endEl.closest('[data-live-editor-color="1"], span, a, button');
+
+    var clickableStart = startEl && startEl.closest('a,button');
+    var clickableEnd = endEl && endEl.closest('a,button');
+
+    if (clickableStart && clickableEnd && clickableStart === clickableEnd) {
+      clickableStart.style.setProperty(propertyName, colorValue, 'important');
+      var clickableChildren = clickableStart.querySelectorAll('span,[data-live-editor-color="1"]');
+      for (var i = 0; i < clickableChildren.length; i++) {
+        clickableChildren[i].style.setProperty(propertyName, colorValue, 'important');
+      }
+      reselectNodeContents(clickableStart);
+      return;
+    }
+
+    if (directStart && directEnd && directStart === directEnd) {
+      directStart.style.setProperty(propertyName, colorValue, 'important');
+      reselectNodeContents(directStart);
+      return;
+    }
+
+    var existingWrapper = startEl && startEl.closest('[data-live-editor-color="1"]');
+    if (existingWrapper && existingWrapper.contains(range.endContainer)) {
+      existingWrapper.style.setProperty(propertyName, colorValue, 'important');
+      reselectNodeContents(existingWrapper);
+      return;
+    }
+
     var wrapper = document.createElement('span');
     wrapper.setAttribute('data-live-editor-color', '1');
     wrapper.style.setProperty(propertyName, colorValue, 'important');
