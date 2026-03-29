@@ -514,8 +514,8 @@
   function sanitizeImageUrl(url) {
     var raw = String(url || '').trim();
     if (!raw) return '';
-    if (/^https?:\/\//i.test(raw)) return raw;
-    if (/^\//.test(raw)) return raw;
+    if (/^https?:\\/\\//i.test(raw)) return raw;
+    if (/^\\//.test(raw)) return raw;
     return '';
   }
 
