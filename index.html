@@ -249,6 +249,7 @@
           <button type="button" class="btn" data-cmd="italic" title="Italic"><i>I</i></button>
           <button type="button" class="btn" data-cmd="underline" title="Underline"><u>U</u></button>
           <button type="button" class="btn" data-cmd="strikeThrough" title="Strike"><s>S</s></button>
+          <button type="button" class="btn" id="insert-link" title="Insert Link">🔗</button>
           <div class="sep"></div>
 
           <select id="font-name" title="Jenis Font">
@@ -382,6 +383,7 @@
       const imageUrlInput = document.getElementById('image-url');
       const imageAltInput = document.getElementById('image-alt');
       const insertImageBtn = document.getElementById('insert-image');
+      const insertLinkBtn = document.getElementById('insert-link');
       const blockTemplate = document.getElementById('block-template');
       const insertBlockBtn = document.getElementById('insert-block');
 
@@ -529,6 +531,24 @@
     return '';
   }
 
+  function sanitizeLinkUrl(url) {
+    var raw = String(url || '').trim();
+    if (!raw) return '';
+    if (/^(https?:|mailto:|tel:)/i.test(raw)) return raw;
+    if (/^[#/]/.test(raw)) return raw;
+    if (/^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(raw)) return 'https://' + raw;
+    return '';
+  }
+
+  function escapeHtml(text) {
+    return String(text || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function insertHtmlAtSelection(html) {
     var sel = window.getSelection();
     if (!sel) return;
@@ -614,6 +634,27 @@
     insertHtmlAtSelection(html);
   }
 
+  function insertLinkFromPayload(payload) {
+    var safeUrl = sanitizeLinkUrl(payload && payload.url);
+    if (!safeUrl) return;
+
+    var sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      var range = sel.getRangeAt(0);
+      if (!range.collapsed) {
+        try {
+          document.execCommand('createLink', false, safeUrl);
+          return;
+        } catch (_err) {}
+      }
+    }
+
+    var label = String((payload && payload.text) || safeUrl);
+    var href = safeUrl.replace(/"/g, '&quot;');
+    var html = '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(label) + '</a>';
+    insertHtmlAtSelection(html);
+  }
+
   if (document.body) {
     document.body.contentEditable = 'true';
     document.body.style.outline = 'none';
@@ -661,6 +702,8 @@
         applyColorWithImportant('background-color', val);
       } else if (cmd === 'insertImageByUrl') {
         insertImageByLink(val || {});
+      } else if (cmd === 'insertLink') {
+        insertLinkFromPayload(val || {});
       } else if (cmd === 'insertBlockTemplate') {
         var blockHtml = buildInteractiveBlock(String(val || ''));
         if (blockHtml) insertHtmlAtSelection(blockHtml);
@@ -748,6 +791,23 @@
         imageUrlInput.focus();
       }
 
+      function insertLinkFromToolbar() {
+        var initial = 'https://';
+        var url = window.prompt('Masukkan URL link:', initial);
+        if (!url) return;
+        var cleaned = String(url).trim();
+        if (!cleaned) return;
+
+        var selectedText = '';
+        try {
+          if (frame.contentWindow && frame.contentWindow.getSelection) {
+            selectedText = String(frame.contentWindow.getSelection().toString() || '').trim();
+          }
+        } catch (_err) {}
+
+        applyFormat('insertLink', { url: cleaned, text: selectedText || cleaned });
+      }
+
       function insertInteractiveBlock() {
         if (!blockTemplate.value) return;
         applyFormat('insertBlockTemplate', blockTemplate.value);
@@ -761,6 +821,10 @@
 
       insertImageBtn.addEventListener('click', function () {
         insertImageFromToolbar();
+      });
+
+      insertLinkBtn.addEventListener('click', function () {
+        insertLinkFromToolbar();
       });
 
       imageUrlInput.addEventListener('keydown', function (e) {
